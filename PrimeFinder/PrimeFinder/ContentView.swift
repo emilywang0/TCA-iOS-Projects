@@ -37,12 +37,14 @@ class AppState: ObservableObject {
     let objectDidChange = ObservableObjectPublisher()
     
     @Published var count = 0
+    @Published var favouritePrimes: [Int] = []
     
 }
 
 
 struct CounterView: View {
     @ObservedObject var state: AppState
+    @State var isPrimeModalShown: Bool = false
 
     var body: some View {
         VStack {
@@ -55,7 +57,7 @@ struct CounterView: View {
                     Text("+")
                 }
             }
-            Button(action: {}) {
+            Button(action: { self.isPrimeModalShown = true}) {
                 Text("Is this prime?")
             }
 
@@ -65,6 +67,46 @@ struct CounterView: View {
         }
         .font(.title)
         .navigationBarTitle("Counter demo")
+        .sheet(
+            isPresented: $isPrimeModalShown,
+            onDismiss: {self.isPrimeModalShown = false},
+            content: {
+                IsPrimeModalView(state: self.state)
+            })
+    }
+}
+
+private func isPrime(_ p: Int) -> Bool {
+    if p <= 1 { return false }
+    if p <= 3 { return true }
+    for i in 2...Int(sqrtf(Float(p))) {
+        if p % i == 0 { return false }
+    }
+    return true
+}
+
+struct IsPrimeModalView: View {
+    @ObservedObject var state: AppState
+    var body: some View {
+        VStack {
+            if (isPrime(self.state.count)) {
+                Text("\(self.state.count) is prime! 🎉")
+                if self.state.favouritePrimes.contains(self.state.count) {
+                    Button(action: {self.state.favouritePrimes.removeAll(where: { $0 == self.state.count })}) {
+                        Text("Remove from favourite primes")
+                    }
+                } else {
+                    Button(action: { self.state.favouritePrimes.append(self.state.count)}) {
+                        Text("Save to favourite primes")
+                    }
+                }
+
+            } else {
+                Text("\(self.state.count) is not prime 😢")
+            }
+
+        }
+
     }
 }
 
