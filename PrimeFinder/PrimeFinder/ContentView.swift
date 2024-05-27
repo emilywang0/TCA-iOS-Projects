@@ -93,6 +93,7 @@ struct AppState {
     
     var count = 0
     var favouritePrimes: [Int] = []
+    var loggedInUser: User? = nil
     var activityFeed: [Activity] = []
     
     struct Activity {
@@ -105,6 +106,12 @@ struct AppState {
         }
     }
     
+    struct User {
+        let id: Int
+        let name: String
+        let bio: String
+    }
+    
 }
 
 final class Store<Value>: ObservableObject {
@@ -115,9 +122,20 @@ final class Store<Value>: ObservableObject {
     }
 }
 
-//Store<AppState>
-// @ObservedObject var state: AppState
-// -> @ObservedObject var store: Store<AppState>
+enum CounterAction {
+    case decrTapped
+    case incrTapped
+}
+
+func counterReducer(state: AppState, action: CounterAction) -> AppState {
+    switch action {
+    case .decrTapped:
+        return AppState(count: state.count - 1, favouritePrimes: state.favouritePrimes, loggedInUser: state.loggedInUser, activityFeed: state.activityFeed)
+    case .incrTapped:
+        return AppState(count: state.count + 1, favouritePrimes: state.favouritePrimes, loggedInUser: state.loggedInUser, activityFeed: state.activityFeed)
+    }
+
+}
 
 struct PrimeAlert: Identifiable {
     let prime: Int
@@ -259,3 +277,4 @@ struct FavoritePrimesView: View {
 #Preview {
     ContentView(store: Store(initialValue: AppState()))
 }
+
