@@ -11,7 +11,7 @@ import SwiftUI
 struct PrimeFinderApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(store: Store(initialValue: AppState()))
+            ContentView(store: Store(initialValue: AppState(), reducer: appReducer))
         }
     }
 }
